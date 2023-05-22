@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 // Add this line
 const cors = require('cors');
 
-// checking here db is connection successfully or not
+// checking here db connected successfully or not. you will get just a confirmation message on your console , nothing else
 const dbConnection = require('./util/database');
 // 
 
