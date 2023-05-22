@@ -1,4 +1,4 @@
-const dbConnection = require("../util/database");
+const dbConnection = require("../../util/database");
 
 exports.postAddFoundation=(req, res, next) => {
     const { name, website_link, owner_name } = req.body;
