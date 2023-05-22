@@ -1,7 +1,7 @@
 # donation-node
 # node version is 18.14.0
 
-# XXXXXXXXXXXXXXXX Configuration Steps of backend (server) XXXXXXXXXXXXXXXXX
+# Configuration Steps of backend (server)
 ### 1- clone the app
 ### 2- Install the dependencies (npm install)
 ### 3- Istall the xampp in your machine to access the mysql
