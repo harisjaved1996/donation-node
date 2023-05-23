@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 23, 2023 at 09:05 AM
+-- Generation Time: May 23, 2023 at 03:57 PM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 8.2.0
 
@@ -57,6 +57,27 @@ INSERT INTO `foundations` (`id`, `name`, `website_link`, `owner_name`) VALUES
 (8, 'Haris', 'www.google.com', 'javed'),
 (9, 'Haris', 'www.google.com', 'javed');
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users`
+--
+
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL,
+  `name` text NOT NULL,
+  `email` text NOT NULL,
+  `password` text NOT NULL,
+  `userType` int(11) NOT NULL COMMENT 'user Type "1" will show its a admin'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `name`, `email`, `password`, `userType`) VALUES
+(1, 'Haris', 'haris@yahoo.com', '$2a$12$OlJZsS1G4KpIDN9d9D4ymumg2EbUn0RFSuK71ULsmcuuQ2EeWwzGS', 1);
+
 --
 -- Indexes for dumped tables
 --
@@ -74,6 +95,12 @@ ALTER TABLE `foundations`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -88,6 +115,12 @@ ALTER TABLE `brands`
 --
 ALTER TABLE `foundations`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
