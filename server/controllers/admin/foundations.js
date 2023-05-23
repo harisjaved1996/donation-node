@@ -14,6 +14,7 @@ exports.postAddFoundation=(req, res, next) => {
 };
 
 exports.getFoundations=(req, res, next) => {
+    console.log("AAAAAAAAAA");
     const sql = 'SELECT * FROM foundations';
     dbConnection.query(sql, (err, results) => {
       if (err) {
