@@ -12,6 +12,9 @@ const dbConnection = require('./util/database');
 // Addming Admin Routes
 const adminRoutes = require('./routes/admin');
 
+// auth routes
+const authRoutes = require('./routes/auth');
+
 // Create Express app
 const app = express();
 
@@ -24,6 +27,9 @@ app.use(cors());
 
 // admin routes will go there
 app.use('/admin', adminRoutes);
+
+// auth routes will go there
+app.use('/auth', authRoutes);
 
 // Start the server
 const port = 8080;
