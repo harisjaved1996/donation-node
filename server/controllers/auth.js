@@ -1,11 +1,27 @@
 // const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const dbConnection = require("../util/database");
+const User = require("../models/user");
 
 exports.login = (req, res, next) => {
   let loadedUser;
   const {email, password} = req.body;
+  bcrypt.hash(password, 12).then(hashedPw => {
+    User.create({ name:'haris',email:email,password:hashedPw,userType:1 }).then(result=>{
+      return res.status(200).json({result:result});
+    }).catch(error=>{
+      return res.status(500).json({error:error});
+    })
+  });
+  
+  // User.findOne({ where: { email: email } }).then(user=>{
+  //   return res.status(200).json({users:user[0]});
+  // }).catch(err=>{
+  //   return res.status(500).json({error:`error on login api ${err}`});
+  // });
+
+
+  /*
   const sql = 'select * from users where email = ?';
   dbConnection.query(sql, [email], (err, results) => {
     if (err) {
@@ -32,6 +48,21 @@ exports.login = (req, res, next) => {
         } 
       });
     }
+  });
+  */
+};
+
+exports.dummyAdmin = (req, res, next) => {
+  const {email, password} = req.body;
+  bcrypt.hash(password, 12).then(hashedPw => {
+    // Truncate the table
+    User.destroy({truncate: true}).then(result=>{
+      return User.create({ name:'haris',email:email,password:hashedPw,userType:1 });
+    }).then(result=>{
+      return res.status(200).json({result:result});
+    }).catch(error=>{
+      return res.status(500).json({error:error});
+    })
   });
 };
 
