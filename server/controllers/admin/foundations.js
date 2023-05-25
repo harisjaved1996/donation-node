@@ -1,72 +1,56 @@
-const dbConnection = require("../../util/database");
+const Foundation = require("../../models/foundation");
 
 exports.postAddFoundation=(req, res, next) => {
     const { name, website_link, owner_name } = req.body;
-    const sql = 'INSERT INTO foundations (name, website_link, owner_name) VALUES (?, ?, ?)';
-    dbConnection.query(sql, [name, website_link, owner_name], (err, result) => {
-      if (err) {
-        console.error('Error creating foundation:', err);
-        res.status(500).json({ error: 'Error creating foundation' });
-      } else {
-        res.status(201).json({ message: 'foundation created successfully' });
-      }
+    Foundation.create({ name:name,website_link:website_link,owner_name:owner_name}).then(result=>{
+      return res.status(201).json({ msg: `Foundation created sucessfully` });
+    }).catch(error=>{
+      return res.status(500).json({ error: `Error in creating Foundation ${error}` });
     });
 };
 
 exports.getFoundations=(req, res, next) => {
-    const sql = 'SELECT * FROM foundations';
-    dbConnection.query(sql, (err, results) => {
-      if (err) {
-        console.error('Error fetching foundation:', err);
-        res.status(500).json({ error: 'Error fetching foundation' });
-      } else {
-        res.status(200).json(results);
-      }
+    Foundation.findAll().then(result=>{
+      return res.status(200).json({foundations:result});
+    }).catch(error=>{
+      return res.status(500).json({ error: `Error fetching Foundation ${error}` });
     });
 };
 
 exports.getFoundation=(req, res, next) => {
     const { id } = req.body;
-    const sql = 'SELECT * FROM foundations WHERE id = ?';
-    dbConnection.query(sql, [id], (err, results) => {
-      if (err) {
-        console.error('Error fetching Foundations:', err);
-        res.status(500).json({ error: 'Error fetching foundations' });
-      } else if (results.length === 0) {
-        res.status(404).json({ error: 'Foundation not found' });
-      } else {
-        res.status(200).json(results[0]);
+    Foundation.findByPk(id).then(result=>{
+      if(!result){
+        return res.status(404).json({msg:"Foundation does not exist"});
       }
+      return res.status(200).json({Foundation:result});
+    }).catch(error=>{
+      return res.status(500).json({ error: `Error fetching Foundation ${error}` });
     });
 };
 
 
 exports.updateFoundation=(req, res, next) => {
-    const { name, website_link, owner_name, id } = req.body;
-    const sql = 'UPDATE foundations SET name = ?, website_link = ?, owner_name = ?  WHERE id = ?';
-    dbConnection.query(sql, [name, website_link, owner_name, id], (err, result) => {
-      if (err) {
-        console.error('Error updating foundation:', err);
-        res.status(500).json({ error: 'Error updating foundation' });
-      } else if (result.affectedRows === 0) {
-        res.status(404).json({ error: 'foundation not found' });
-      } else {
-        res.status(200).json({ message: 'foundation Update Successfully'});
-      }
-    });
+  const { name:updatedName, website_link:updateWebsiteLink, owner_name:updatedOwnerName, id } = req.body;
+  Foundation.findByPk(id).then(foundation=>{
+    foundation.name=updatedName;
+    foundation.website_link=updateWebsiteLink;
+    foundation.owner_name=updatedOwnerName;
+    return foundation.save();
+  }).then(result=>{
+    return res.status(200).json({msg:`Foundation updated Successfully`});
+  }).catch(error=>{
+    return res.status(500).json({error:`error in updating the Foundation ${error}`});
+  })
 };
 
 exports.deleteFoundation=(req, res, next) => {
     const { id } = req.body;
-    const sql = 'Delete FROM  foundations WHERE id = ?';
-    dbConnection.query(sql, [id], (err, result) => {
-      if (err) {
-        console.error('Error deleting foundation:', err);
-        res.status(500).json({ error: 'Error deleting foundation' });
-      } else if (result.affectedRows === 0) {
-        res.status(404).json({ error: 'foundation not found' });
-      } else {
-        res.status(200).json({ message: 'foundation deleted Successfully'});
-      }
-    });
+    Foundation.findByPk(id).then(Foundation=>{
+      return Foundation.destroy();
+    }).then(result=>{
+      return res.status(200).json({msg:`Foundation deleted Successfully`});
+    }).catch(error=>{
+      return res.status(500).json({error:`error in deleting the Foundation ${error}`});
+    })
 };
