@@ -2,8 +2,13 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require("../models/user");
-
+const { validationResult } = require('express-validator');
 exports.login = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const errorsMsg = errors.errors.map((err) => err.msg);
+    return res.status(422).json({error:errorsMsg});
+  }
   let loadedUser;
   const {email, password} = req.body;
   
@@ -11,7 +16,7 @@ exports.login = (req, res, next) => {
     // 
     loadedUser = user;
     if(!loadedUser){
-      return res.status(404 ).json({error:`Invalid Email`});
+      return res.status(404).json({error:`Invalid Email`});
     }
     loadedUser=loadedUser.dataValues;
     bcrypt.compare(password, loadedUser.password).then((isEqual)=>{
