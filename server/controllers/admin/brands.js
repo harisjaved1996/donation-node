@@ -1,72 +1,54 @@
-const dbConnection = require("../../util/database");
+const Brand = require("../../models/brand");
 
 exports.postAddBrand=(req, res, next) => {
     const { name, website_link, owner_name } = req.body;
-    const sql = 'INSERT INTO brands (name, website_link, owner_name) VALUES (?, ?, ?)';
-    dbConnection.query(sql, [name, website_link, owner_name], (err, result) => {
-      if (err) {
-        console.error('Error creating brand:', err);
-        res.status(500).json({ error: 'Error creating brand' });
-      } else {
-        res.status(201).json({ message: 'brand created successfully' });
-      }
+    Brand.create({ name:name,website_link:website_link,owner_name:owner_name}).then(result=>{
+      return res.status(201).json({ msg: `brand created sucessfully` });
+    }).catch(error=>{
+      return res.status(500).json({ error: `Error creating brand ${error}` });
     });
 };
 
 exports.getBrands=(req, res, next) => {
-    const sql = 'SELECT * FROM brands';
-    dbConnection.query(sql, (err, results) => {
-      if (err) {
-        console.error('Error fetching brands:', err);
-        res.status(500).json({ error: 'Error fetching brands' });
-      } else {
-        res.status(200).json(results);
-      }
+    Brand.findAll().then(result=>{
+      return res.status(200).json({brands:result});
+    }).catch(error=>{
+      return res.status(500).json({ error: `Error fetching brands ${error}` });
     });
 };
 
 exports.getBrand=(req, res, next) => {
     const { id } = req.body;
-    const sql = 'SELECT * FROM brands WHERE id = ?';
-    dbConnection.query(sql, [id], (err, results) => {
-      if (err) {
-        console.error('Error fetching brand:', err);
-        res.status(500).json({ error: 'Error fetching brand' });
-      } else if (results.length === 0) {
-        res.status(404).json({ error: 'brnad not found' });
-      } else {
-        res.status(200).json(results[0]);
-      }
+    
+    Brand.findByPk(id).then(result=>{
+      return res.status(200).json({brand:result});
+    }).catch(error=>{
+      return res.status(500).json({ error: `Error fetching brand ${error}` });
     });
 };
 
 
 exports.updateBrand=(req, res, next) => {
-    const { name, website_link, owner_name, id } = req.body;
-    const sql = 'UPDATE brands SET name = ?, website_link = ?, owner_name = ?  WHERE id = ?';
-    dbConnection.query(sql, [name, website_link, owner_name, id], (err, result) => {
-      if (err) {
-        console.error('Error updating brand:', err);
-        res.status(500).json({ error: 'Error updating brand' });
-      } else if (result.affectedRows === 0) {
-        res.status(404).json({ error: 'brand not found' });
-      } else {
-        res.status(200).json({ message: 'brand Update Successfully'});
-      }
-    });
+  const { name:updatedName, website_link:updateWebsiteLink, owner_name:updatedOwnerName, id } = req.body;
+  Brand.findByPk(id).then(brand=>{
+    brand.name=updatedName;
+    brand.website_link=updateWebsiteLink;
+    brand.owner_name=updatedOwnerName;
+    return brand.save();
+  }).then(result=>{
+    return res.status(200).json({msg:`Brand updated Successfully`});
+  }).catch(error=>{
+    return res.status(500).json({error:`error in updating the brand ${error}`});
+  })
 };
 
 exports.deleteBrand=(req, res, next) => {
-    const { id } = req.body;
-    const sql = 'Delete FROM  brands WHERE id = ?';
-    dbConnection.query(sql, [id], (err, result) => {
-      if (err) {
-        console.error('Error deleting brand:', err);
-        res.status(500).json({ error: 'Error deleting brand' });
-      } else if (result.affectedRows === 0) {
-        res.status(404).json({ error: 'brand not found' });
-      } else {
-        res.status(200).json({ message: 'brand deleted Successfully'});
-      }
-    });
+    const { id:brandId } = req.body;
+    Brand.findByPk(brandId).then(brand=>{
+      return brand.destroy();
+    }).then(result=>{
+      return res.status(200).json({msg:`Brand deleted Successfully`});
+    }).catch(error=>{
+      return res.status(500).json({error:`error in deleting the brand ${error}`});
+    })
 };

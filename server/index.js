@@ -5,8 +5,8 @@ const bodyParser = require('body-parser');
 // Add this line
 const cors = require('cors');
 
-// checking here db connected successfully or not. you will get just a confirmation message on your console , nothing else
-const dbConnection = require('./util/database');
+// Will use this to create the models (tales) in the database
+const sequelize = require('./util/database');
 // 
 
 // Addming Admin Routes
@@ -31,8 +31,15 @@ app.use('/admin', adminRoutes);
 // auth routes will go there
 app.use('/auth', authRoutes);
 
-// Start the server
+// sync the tables of the database
 const port = 8080;
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+sequelize.sync({ alter: true }).then(result=>{
+  console.log("=====Result====",result);
+  app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+  });
+}).catch(error=>{
+  console.log("error",error);
 });
+
+
