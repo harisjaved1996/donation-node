@@ -1,13 +1,9 @@
 // Import dependencies
 const express = require('express');
 const bodyParser = require('body-parser');
-
+const mongoose = require('mongoose');
 // Add this line
 const cors = require('cors');
-
-// Will use this to create the models (tales) in the database
-const sequelize = require('./util/database');
-// 
 
 // Addming Admin Routes
 const adminRoutes = require('./routes/admin');
@@ -31,15 +27,14 @@ app.use('/admin', adminRoutes);
 // auth routes will go there
 app.use('/auth', authRoutes);
 
-// sync the tables of the database
+// starting app and connecting with the database
 const port = 8080;
-sequelize.sync({ alter: true }).then(result=>{
-  console.log("=====Result====",result);
+
+mongoose.connect('mongodb://127.0.0.1:27017/donation').then(result=>{
+  console.log("app connected with database");
   app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
   });
 }).catch(error=>{
-  console.log("error",error);
-});
-
-
+  console.log("app did not connect with the mongodb",error);
+})

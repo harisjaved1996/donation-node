@@ -12,13 +12,11 @@ exports.login = (req, res, next) => {
   let loadedUser;
   const {email, password} = req.body;
   
-  User.findOne({ where: { email: email } }).then(user=>{
-    // 
+  User.findOne({ email: email }).then(user=>{
     loadedUser = user;
     if(!loadedUser){
       return res.status(404).json({error:`Invalid Email`});
     }
-    loadedUser=loadedUser.dataValues;
     bcrypt.compare(password, loadedUser.password).then((isEqual)=>{
       if(!isEqual){
         return res.status(404).json({ error: 'invalid Password' });
@@ -26,8 +24,7 @@ exports.login = (req, res, next) => {
       const token = jwt.sign(
           {
           email:loadedUser.email,
-          userId:loadedUser.id.toString(),
-          userType:loadedUser.userType.toString()
+          userId:loadedUser._id.toString(),
           },
           'somesupersecretsecret',
           { expiresIn: '1h' }
@@ -41,17 +38,31 @@ exports.login = (req, res, next) => {
   
 };
 
-exports.dummyAdmin = (req, res, next) => {
-  const {email, password} = req.body;
-  bcrypt.hash(password, 12).then(hashedPw => {
-    // Truncate the table
-    User.destroy({truncate: true}).then(result=>{
-      return User.create({ name:'haris',email:email,password:hashedPw,userType:1 });
-    }).then(result=>{
-      return res.status(200).json({result:result});
-    }).catch(error=>{
+exports.registration = (req, res, next) => {
+  let errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    errors = errors.errors.map((err) => err.msg);
+    return res.status(422).json({error:errors});
+  }
+  const {name,email, password} = req.body;
+  User.findOne({ email: email }).then(user=>{
+    if(user){
+      return res.status(422).json({error:"User Already Exist with this email"});
+    }
+    bcrypt.hash(password, 12).then(hashedPw => {
+      const user = new User({
+        name:name,
+        email: email,
+        password:hashedPw
+      });
+      user.save().then(result=>{
+        res.status(201).json({msg:"User Created Successfully"});
+      }).catch(error=>{
+        return res.status(500).json({error:error});
+      });
+    });
+  }).catch(error=>{
       return res.status(500).json({error:error});
-    })
   });
 };
 
